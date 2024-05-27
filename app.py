@@ -115,9 +115,8 @@ async def transcribe(device, videoPath, name, modelName):
 headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Safari/605.1.15"}
 
 async def main():
-    os.system("title CYCU-iLearning-Scraper")
+    os.system("title CYCU-iLearning-Video-Transcription")
     print("<!!! 尊重版權/著作權 尊重版權/著作權 尊重版權/著作權 !!!>")
-    # try:
     id = input("輸入您的學號：")
     pwd = getpass.getpass("輸入您的itouch密碼：")
     
@@ -141,57 +140,57 @@ async def main():
         
         courses = await fetch_courses(session)
         while(True) :
-            i = 0
-            courseKeys = list(courses.keys())
-            for i in range(len(courseKeys)):
-                print( str(i) + ": "+ courses[courseKeys[i]])
-                i +=1
-            
-            print("輸入編號選擇課程 (輸入 -1 返回)")
-            keyIndex = None
-            while(keyIndex == None or keyIndex >= len(courseKeys) or keyIndex < -1):
-                try:
-                    keyIndex = int(input("> "))
-                except Exception as e:
-                    print(e)
+            try:
+                i = 0
+                courseKeys = list(courses.keys())
+                for i in range(len(courseKeys)):
+                    print( str(i) + ": "+ courses[courseKeys[i]])
+                    i +=1
+                
+                print("輸入編號選擇課程")
+                
+                keyIndex = None
+                while(keyIndex == None or keyIndex >= len(courseKeys) or keyIndex < -1):
+                    try:
+                        keyIndex = int(input("> "))
+                    except Exception as e:
+                        print(e)
+                        continue
+                if keyIndex == -1:
                     continue
-            if keyIndex == -1:
-                continue
-            
-            hrefs = await fetch_videos(session, courseKeys[keyIndex])
-            
-            for i, (name, _) in enumerate(hrefs.items()):
-                print(str(i) + ": " + name)
-            
-            print("輸入編號轉錄課程 (輸入 -1 返回)")
-            courseIndex = None
-            while(courseIndex == None or courseIndex >= len(hrefs) or courseIndex < -1):
-                try:
-                    courseIndex = int(input("> "))
-                except Exception as e:
-                    print(e)
+                
+                hrefs = await fetch_videos(session, courseKeys[keyIndex])
+                
+                for i, (name, _) in enumerate(hrefs.items()):
+                    print(str(i) + ": " + name)
+                
+                print("輸入編號轉錄課程 (輸入 -1 返回)")
+                courseIndex = None
+                while(courseIndex == None or courseIndex >= len(hrefs) or courseIndex < -1):
+                    try:
+                        courseIndex = int(input("> "))
+                    except Exception as e:
+                        print(e)
+                        continue
+                if courseIndex == -1:
                     continue
-            if courseIndex == -1:
-                continue
-            
-            print("影片下載中...")
-            start = time.time()
-            videoName = list(hrefs.keys())[courseIndex]
-            filePath = await downloadVideo(session, videoName, hrefs[videoName])
-            print(f"下載完成! 耗時: {time.time() - start}s")
-            
-            start = time.time()
-            print("AI轉錄中...")
-            await transcribe(device, filePath, videoName, model)
-            print(f"轉錄完成! 耗時: {time.time() - start}s")
-            
-            input("點擊Enter繼續...")
-        
-        
-        
-    # except Exception as e:
-    #     print(e)
-    os.system("pause")
+                
+                print("影片下載中...")
+                start = time.time()
+                videoName = list(hrefs.keys())[courseIndex]
+                filePath = await downloadVideo(session, videoName, hrefs[videoName])
+                print(f"下載完成! 耗時: {time.time() - start}s")
+                
+                start = time.time()
+                print("AI轉錄中...")
+                await transcribe(device, filePath, videoName, model)
+                print(f"轉錄完成! 耗時: {time.time() - start}s")
+                
+                input("點擊Enter繼續...")
+            except Exception as e:
+                print(e)
+                os.system("pause")
+                return
 
 if __name__ == "__main__":
     asyncio.run(main())
