@@ -124,12 +124,12 @@ async def main():
     async with aiohttp.ClientSession(connector=connector) as session:
         login_key = await fetch_login_key(session)
         if not await login(session, id, pwd, login_key):
-            return main()
+            return await main()
 
-        print("0: CUDA(GPU)")
-        print("1: CPU")
+        print("0: CPU")
+        print("1: CUDA (GPU)")
         print("選擇運算方式")
-        device = "cpu" if int(input("> ")) != 0 else "cuda"
+        device = "cpu" if int(input("> ")) == 0 else "cuda"
         
         print("0: base (138 MB容量)")
         print("1: tiny (72 MB容量)")
@@ -164,7 +164,7 @@ async def main():
                 for i, (name, _) in enumerate(hrefs.items()):
                     print(str(i) + ": " + name)
                 
-                print("輸入編號轉錄課程 (輸入 -1 返回)")
+                print("輸入編號轉錄影片 (輸入 -1 返回)")
                 courseIndex = None
                 while(courseIndex == None or courseIndex >= len(hrefs) or courseIndex < -1):
                     try:
@@ -188,9 +188,12 @@ async def main():
                 
                 input("點擊Enter繼續...")
             except Exception as e:
+                traceback = e.__traceback__
+                while traceback:
+                    print("{}: {}".format(traceback.tb_frame.f_code.co_filename,traceback.tb_lineno))
+                    traceback = traceback.tb_next
                 print(e)
-                os.system("pause")
-                return
-
+                
 if __name__ == "__main__":
     asyncio.run(main())
+    os.system("pause")
