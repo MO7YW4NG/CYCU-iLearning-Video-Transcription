@@ -1,4 +1,4 @@
-# 中原大學 i-Learning 教學教材爬蟲 CYCU-iLearning-Scraper
+# 中原大學 i-Learning 教學影片轉錄逐字稿
 <p align="center">
   <img src="https://i.imgur.com/q65ktuN.png" />
 </p>
