@@ -13,7 +13,7 @@
 ## 使用方法
 
 1. [下載壓縮檔](https://github.com/MO7YW4NG/CYCU-iLearning-Video-Transcription/releases)
-2. 解壓縮後生成 `CYCU-iLearning-Video-Transcrption` 資料夾
+2. 解壓縮後生成 `CYCU-iLearning-Video-Transcription` 資料夾
 3. 開啟 `app.exe` 後登入即啟用!
 
 ## 版權
