@@ -3,6 +3,8 @@
   <img src="https://i.imgur.com/q65ktuN.png" />
 </p>
 
+https://github.com/MO7YW4NG/CYCU-iLearning-Video-Transcription/assets/66549438/58748976-3569-4af5-a1f6-a2fac0de5c48
+
 ## 提醒
 <p align="center">
   <img src="https://www.lhu.edu.tw/psmart/ex/2019%E6%B5%B7%E5%A0%B1.jpg" />
