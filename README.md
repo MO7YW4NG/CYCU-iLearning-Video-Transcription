@@ -14,14 +14,15 @@ https://github.com/MO7YW4NG/CYCU-iLearning-Video-Transcription/assets/66549438/5
 此程式協助你下載 iLearning 教材影片，並透過 OpenAI-WhisperAPI 轉錄成逐字稿。
 ## 使用方法
 
-1. [下載 .ipynb 檔](https://github.com/MO7YW4NG/CYCU-iLearning-Video-Transcription/releases)
-2. 自 [Google Colab](https://colab.research.google.com/) 開啟
+**[Google Colab](https://colab.research.google.com/drive/1aFwV8j8SrB6SsPRVZiPQraEkXXbpfVVG?usp=sharing)**
 
 ~~1. [下載壓縮檔](https://github.com/MO7YW4NG/CYCU-iLearning-Video-Transcription/releases)~~
 
 ~~2. 解壓縮後生成 `CYCU-iLearning-Video-Transcription` 資料夾~~
 
 ~~3. 開啟 `app.exe` 後登入即啟用!~~
+
+~~4. 若遇到 AI轉錄失效，請將 `_internal/ffmpeg.exe` 移動到前一個資料夾~~
 
 ## 版權
 此專案之版權規範採用 **MIT License** - 至 [LICENSE](LICENSE) 查看更多相關聲明
