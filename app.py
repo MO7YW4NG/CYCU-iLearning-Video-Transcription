@@ -9,8 +9,10 @@ from bs4 import BeautifulSoup
 import time
 import asyncio
 import re
-import whisper
+import subprocess
+from faster_whisper import WhisperModel
 
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
 url = "https://i-learning.cycu.edu.tw/"
 
 # MD5 Encrypt
@@ -95,23 +97,32 @@ async def downloadVideo(session, filename, href) -> str:
                     file.write(chunk)
         return file_path
 
-async def transcribe(device, videoPath, name, modelName):
+async def transcribe(model, videoPath, name):
     # file = open(videoPath, "rb")
-    download_root = "model/"
-    if not os.path.exists(download_root):
-        os.makedirs(download_root)
-    model = whisper.load_model(modelName,device=device,download_root=download_root)
-    result = model.transcribe(videoPath)
-    # model = WhisperModel(modelName, device=device, compute_type="float16" if device=="cuda" else "int8",download_root=download_root)
-    # segments, _ = model.transcribe(file, language="zh")
+    # model = whisper.load_model(modelName,device=device,download_root=download_root)
+
+    audioFile = extractAudio(videoPath)
+    # result = model.transcribe(audioFile)
+    segments, _ = model.transcribe(audioFile, language="zh")
     save_path = f"videos/"
     if not os.path.exists(save_path):
         os.makedirs(save_path)
     file_path = os.path.join(save_path, name +"_transcrption.txt")
     with open(file_path, 'w', encoding="utf-8") as txt:
-        for segment in result['segments']:
-            txt.write("[%.2fs -> %.2fs] %s\n" % (segment["start"], segment["end"], segment["text"]))
+        for segment in segments:
+            txt.write("[%.2fs -> %.2fs] %s\n" % (segment.start, segment.end, segment.text))
+        # for segment in result['segments']:
+            # txt.write("[%.2fs -> %.2fs] %s\n" % (segment["start"], segment["end"], segment["text"]))
+    os.remove(audioFile)
+            
+def extractAudio(video_file, output_ext="mp3"):
+    filename, _ = os.path.splitext(video_file)
+    subprocess.call(["ffmpeg", "-y", "-i", video_file, f"{filename}.{output_ext}"], 
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.STDOUT)
+    return f"{filename}.{output_ext}"
     
+
 headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Safari/605.1.15"}
 
 async def main():
@@ -131,16 +142,21 @@ async def main():
         print("選擇運算方式")
         device = "cpu" if int(input("> ")) == 0 else "cuda"
         
-        print("0: base (138 MB容量)")
-        print("1: tiny (72 MB容量)")
-        print("2: small (461 MB容量)")
+        print("0: small 能力中等")
+        print("1: medium 能力弱")
+        print("2: large-v3 能力強")
         print("選擇模型類型")
-        modelChoice= ['base','tiny','small']
-        model = modelChoice[int(input("> "))]
+        modelChoice= ['small','medium','large-v3']
+        modelName = modelChoice[int(input("> "))]
+        
+        download_root = "model/"
+        if not os.path.exists(download_root):
+            os.makedirs(download_root)
+        model = WhisperModel(modelName, device=device,download_root=download_root , compute_type="auto")
         
         courses = await fetch_courses(session)
-        while(True) :
-            try:
+        try:
+            while(True):
                 i = 0
                 courseKeys = list(courses.keys())
                 for i in range(len(courseKeys)):
@@ -161,6 +177,9 @@ async def main():
                 
                 hrefs = await fetch_videos(session, courseKeys[keyIndex])
                 
+                if len(hrefs) == 0:
+                    continue
+                
                 for i, (name, _) in enumerate(hrefs.items()):
                     print(str(i) + ": " + name)
                 
@@ -179,21 +198,17 @@ async def main():
                 start = time.time()
                 videoName = list(hrefs.keys())[courseIndex]
                 filePath = await downloadVideo(session, videoName, hrefs[videoName])
-                print(f"下載完成! 耗時: {time.time() - start}s")
+                print("下載完成! 耗時: %.2fs" % (time.time() - start))
                 
                 start = time.time()
                 print("AI轉錄中...")
-                await transcribe(device, filePath, videoName, model)
-                print(f"轉錄完成! 耗時: {time.time() - start}s")
+                await transcribe(model, filePath, videoName)
+                print("轉錄完成! 耗時: %.2fs" % (time.time() - start))
                 
                 input("點擊Enter繼續...")
-            except Exception as e:
-                traceback = e.__traceback__
-                while traceback:
-                    print("{}: {}".format(traceback.tb_frame.f_code.co_filename,traceback.tb_lineno))
-                    traceback = traceback.tb_next
-                print(e)
-                
+        finally:
+            os.system("pause")
+        
+                    
 if __name__ == "__main__":
     asyncio.run(main())
-    os.system("pause")
